@@ -309,6 +309,7 @@ sudo pip install pykalman # Packages for Engineering
 ```
 
 **tracking_simulator.py：** 用Python写的算法模拟器
+
 ![模拟目标锁定](https://cl.ly/1p1s3c3j0515/tracking_and_lost.gif)
 
 > 利用可能性分布进行目标的锁定，模拟目标缓慢移动时算法锁定追随的目标，最后模拟目标丢失，即目标的运动超出可能性预测的范围，导致目标丢失，此时算法开始全局搜索，寻找新的目标。动图需在网页查看
