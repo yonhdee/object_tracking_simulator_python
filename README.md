@@ -200,12 +200,15 @@ ROS官网中的 **People-Perception** 功能包利用这个方法扫描人腿：
 
 实验代码包含两部分：
 
-1. 比赛使用的ROS包，用于RoboCup@Home项目的Follow环节，使用C++写成
+1. 比赛使用的ROS包，用于RoboCup@Home项目的Follow环节，使用C++实现
 	- user_tracker  *目标追随主程序*
 	- user_tracker_msgs  *目标追随定义的消息格式*
 	- robot_fake  *用于离线调试算法的机器人模拟器*
 	- headless_move_base  *适配于上海大学机器人全向轮底盘的运动控制节点*
 	- bringup  *启动Follow的Launch文件*
+
+	- *代码全部开源，放置于GitHub不定期进行维护，最新更改请于GitHub查看*
+	`https://github.com/yonhdee/RoboCup-Home-Follow`
 
 2. 研究算法使用的Python脚本
 	- filter/
@@ -215,6 +218,10 @@ ROS官网中的 **People-Perception** 功能包利用这个方法扫描人腿：
 	- tracking_simulator.py *鼠标点击模拟激光数据进行跟随*
 	- tracking_simulator_analyse.py *鼠标点击模拟激光数据，绘制数据进行算法分析*
 	- tracking_kalman.py *用于优化、预测平面轨迹的卡尔曼滤波器，用鼠标轨迹模拟坐标输入进行分析*
+
+	- *代码全部开源，放置于GitHub不定期进行维护，最新更改请于GitHub查看*
+	`https://github.com/yonhdee/object_tracking_simulator_python`
+
 
 ### RoboCup@Home 比赛项目的 Follow ROS包
 
@@ -268,13 +275,38 @@ sudo pip install numpy scipy sympy pillow matplotlib --upgrade
 sudo pip install pykalman # Packages for Engineering
 ```
 
-**tracking_simulator.py：**
+**tracking_simulator.py：** 用Python写的算法模拟器
 
-**tracking_simulator_analyse.py：**
+界面分为上下两部分，上半部分模拟激光雷达的裸数据，下半部分显示算法数据。用鼠标左键点击输入，模拟激光数据供跟随算法使用，点击画布灰色部分可以清空画布。
 
-**tracking_kalman.py：**
+下半部分红色圆点代表差分数据，用于进行物体检测以及特征分析，绿色线条代表激光数据的低通平滑效果，‘\*’形线代表锁定人之后下一帧可能性区域的蒙版，下一帧如果人的位置没有突变，算法在此区域局部搜索，从而实现‘锁定人’的效果。
 
-**filter/：** 滤波器：
+如果下一帧仍可以锁定人，根据人的位置更新可能性区域蒙版，如果下一帧在较远的位置点击左键，算法判定跟丢，可能性区域蒙版扩展为全局，算法在下一帧实行全局搜索，重新锁定目标。
+
+**tracking_simulator_analyse.py：** 用Python写的算法模拟器，用于分析数据
+
+界面分为上下两部分，上半部分模拟激光雷达的裸数据，下半部分显示算法数据。
+
+- 鼠标左键单击：清空画布，添加模拟人的数据
+- 鼠标右键单击：不清空画布，用右键点击绘制任意情景的数据
+- 鼠标中键单击：对原始数据进行平滑滤波
+- 点击画布灰色部分可以清空画布
+
+下半部分显示算法数据，模拟激光数据供跟随算法使用，点击画布灰色部分可以清空画布。
+红色圆点代表差分数据，用于进行物体检测以及特征分析，绿色线条代表激光数据的低通平滑效果，‘\*’形线代表分析出的‘物体蒙版’，值为‘1’的部分代表有边缘连续的物体，线条宽度代表物体宽度，用于对物体进行分析、分类。
+
+**tracking_kalman.py：** 鼠标模拟输入，卡尔曼滤波效果
+
+用鼠标在画布走过的轨迹模拟输入二维的点序列，对每次采样后的点坐标添加随机噪声，再对存在噪声的信号进行卡尔曼滤波。
+
+界面模拟 30m*30m 的平面，鼠标移动到画布内程序开始定时采样，记录鼠标的轨迹，并添加半径为1m的随机噪声作为干扰。
+缓慢移动鼠标，绿点代表采样点的真实值，绿线为采样点间的差值，用于记录采样点轨迹，‘+’点代表添加随机噪声后的观测值，红线为卡尔曼滤波器输入观测值后给出的估计值。
+
+**filter/：** 滤波器：一些常用滤波器的Demo
+
+- butterworth.py  *巴特沃斯低通滤波器*
+- kalman.py  *卡尔曼滤波器*
+- smooth.py  *利用门信号卷积实现简单的低通平滑滤波器*
 
 ### 总结
 
